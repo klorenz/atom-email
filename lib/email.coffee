@@ -10,6 +10,10 @@ fs = require 'fs-plus'
 
 {showModalInputPanel} = require './input-view.coffee'
 
+slugify = (s) ->
+  s = s.replace /[A-Z]/g, (m) -> "-#{m}"
+  s = s.replace /[^\w\-]/g, '-'
+  s = s.replace /^-/, ''
 
 module.exports = Email =
   emailView: null
@@ -27,6 +31,29 @@ module.exports = Email =
     if not fs.existsSync @passwdDir
       fs.mkdirSync @passwdDir, 0e0700
 
+  updateAccountSubscriptions: ->
+    if @accountSubscriptions
+      @accountSubscriptions.dispose()
+
+    @accountSubscriptions = new CompositeDisposable
+    mailtool = require './mail-tool'
+
+    commands = {}
+    for accountSpec in mailtool.getConfig()
+      continue if accountSpec.alias
+      for cfgName, cfg of mailtool.getMailerConfig accountSpec.name
+        (=>
+          accountSlug = slugify accountSpec.name
+          cfgSlug     = slugify cfgName
+          if cfgName is 'default'
+            commands["email:send-mail-using-#{accountSlug}"] = =>
+              @sendMail "#{accountSpec.name}.default"
+          else
+            commands["email:send-mail-using-#{accountSlug}-#{cfgSlug}"] = =>
+              @sendMail "#{accountSpec.name}.#{cfgName}"
+        )()
+
+    @accountSubscriptions.add atom.commands.add 'atom-workspace', commands
 
   activate: (state) ->
     @initDirectories()
@@ -41,6 +68,8 @@ module.exports = Email =
     @subscriptions.add atom.commands.add 'atom-workspace',
       'email:send-mail': => @sendMail()
       'email:open-your-mail-configuration': => @openConfigFile()
+
+    @updateAccountSubscriptions()
 
     @subscriptions.add atom.workspace.addOpener (uri) =>
 
@@ -131,8 +160,6 @@ module.exports = Email =
 
     mailtool = require './mail-tool'
 
-    debugger
-
     # options = config: config, text: selected, xMailer: 'Atom Email #{@version}', optionDialog: ({missing, options}) =>
     #   show_input_panel(caption, initial_text, on_done, on_change, on_cancel)
     cancelMail = ->
@@ -150,6 +177,7 @@ module.exports = Email =
           initalValue: options.subject
           onCancel: cancelMail
           onConfirm: (text) =>
+            options.subject = text
             showModalInputPanel
               label: "To (Enter a comma separated list of recipient addresses)"
               initialValue: options.to

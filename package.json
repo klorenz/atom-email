@@ -4,10 +4,6 @@
   "version": "0.2.0",
   "description": "Mail selected text out of atom (beta)",
   "activationCommands": {
-    "atom-workspace": [
-      "email:send-mail",
-      "email:open-your-mail-configuration"
-    ]
   },
   "repository": "https://github.com/klorenz/atom-email.git",
   "license": "MIT",
