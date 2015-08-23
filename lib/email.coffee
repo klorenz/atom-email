@@ -109,7 +109,6 @@ module.exports = Email =
               """
         '''
 
-
   # updateFolderView: ->
   #   @imap.listWellKnownFolders().then (folderInfo) =>
   #     @folderListView.updateItems(folderInfo)
@@ -121,7 +120,6 @@ module.exports = Email =
     if not fs.existsSync @configFile
       return @openConfigFile()
 
-    debugger
     editor = atom.workspace.getActiveTextEditor()
     selected = editor.getSelectedText()
 
@@ -130,15 +128,31 @@ module.exports = Email =
 
     mailtool = require './mail-tool'
 
-    options = config: config, text: selected, xMailer: 'Atom Email #{@version}', optionDialog: ({missing, options}) =>
-      show_input_panel(caption, initial_text, on_done, on_change, on_cancel)
+    debugger
+
+    # options = config: config, text: selected, xMailer: 'Atom Email #{@version}', optionDialog: ({missing, options}) =>
+    #   show_input_panel(caption, initial_text, on_done, on_change, on_cancel)
+    options =
+      config: config
+      text: selected
+      xMailer: 'Atom Email #{@version}'
 
     mailtool.sendMail options, (err, info) =>
 
-      if result instanceof Error
-        console.log "#{result}", result, options, result.stack
-        atom.notifications.addError "#{result}", detail: CSON.stringify {options, traceback: result.stack}
+      if err instanceof Error
 
+        console.log "#{err}", err, options, err.stack
+        atom.notifications.addError "#{err}", detail: CSON.stringify({options, traceback: err.stack})
       else
-        console.log "Email sent", result, info
-        atom.notifications.addSuccess "Email sent :)", detail: "Subject: #{result.data.subject}\nTo: #{result.data.to}\nCc: #{result.data.cc}\n"
+        console.log "Email sent", err, info
+
+        detail = """
+          #{info.response}
+          From: #{info.envelope.from}\n
+        """
+        if info.accepted.length
+          detail = detail + "Accepted: " + info.accepted.join(", ")
+        if info.rejected.length
+          detail = detail + "Rejected: " + info.rejected.join(", ")
+
+        atom.notifications.addSuccess "Email sent :)", detail: detail
