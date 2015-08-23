@@ -1,7 +1,7 @@
 {
   "name": "email",
   "main": "./lib/email",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Mail selected text out of atom (beta)",
   "activationCommands": {
     "atom-workspace": [
