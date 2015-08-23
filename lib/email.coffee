@@ -8,6 +8,8 @@ fs = require 'fs-plus'
 {MailboxEditor} = require './mailbox/mailbox-editor.coffee'
 {MailboxEditorElement} = require './mailbox/mailbox-editor-element.coffee'
 
+{showModalInputPanel} = require './input-view.coffee'
+
 
 module.exports = Email =
   emailView: null
@@ -117,6 +119,7 @@ module.exports = Email =
   #   @folderView.show()
   #
   sendMail: (config=null)->
+
     if not fs.existsSync @configFile
       return @openConfigFile()
 
@@ -132,10 +135,41 @@ module.exports = Email =
 
     # options = config: config, text: selected, xMailer: 'Atom Email #{@version}', optionDialog: ({missing, options}) =>
     #   show_input_panel(caption, initial_text, on_done, on_change, on_cancel)
+    cancelMail = ->
+      atom.notifications.addWarning "Sending Mail Cancelled", detail: "... by yourself"
+
     options =
       config: config
       text: selected
       xMailer: 'Atom Email #{@version}'
+      optionDialog: (options, proceed) =>
+        options = options.options
+
+        showModalInputPanel
+          label: "Subject"
+          initalValue: options.subject
+          onCancel: cancelMail
+          onConfirm: (text) =>
+            showModalInputPanel
+              label: "To (Enter a comma separated list of recipient addresses)"
+              initialValue: options.to
+              onCancel: cancelMail
+              onConfirm: (text) =>
+                options.to = text
+                showModalInputPanel
+                  label: "Cc (Enter a comma separated list of carbon copy recipient addresses)"
+                  initialValue: options.cc
+                  onCancel: cancelMail
+                  onConfirm: (text) =>
+                    options.cc = text
+                    showModalInputPanel
+                      label: "Bcc (Enter a comma separated list of blind carbon copy recipient addresses)"
+                      initialValue: options.bcc
+                      onCancel: cancelMail
+                      onConfirm: (text) =>
+                        options.bcc = text
+                        proceed()
+
 
     mailtool.sendMail options, (err, info) =>
 

@@ -43,6 +43,9 @@ Regards
 
 Select it and then run "Email: Send Mail" command.
 
+Or select some text and run "Email: Send Mail" command.  There will be opened input dialogs for 
+entering Subject, to address and other.  Confirm with `Enter`, cancel with `ESC`.
+
 
 Motivation
 ----------
