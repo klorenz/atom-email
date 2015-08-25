@@ -6,13 +6,12 @@ CSON = require 'season'
 fs = require 'fs-plus'
 
 {MailboxEditor} = require './mailbox/mailbox-editor.coffee'
-{MailboxEditorElement} = require './mailbox/mailbox-editor-element.coffee'
+MailboxEditorElement = require './mailbox/mailbox-editor-element.coffee'
 
 {showModalInputPanel} = require './input-view.coffee'
 
 slugify = (s) ->
-  s = s.replace /[A-Z]/g, (m) -> "-#{m}"
-  s = s.replace /[^\w\-]/g, '-'
+  s = s.replace /[^\w\-@]/g, '-'
   s = s.replace /^-/, ''
 
 module.exports = Email =
@@ -41,17 +40,25 @@ module.exports = Email =
     commands = {}
     for accountSpec in mailtool.getConfig()
       continue if accountSpec.alias
+
       for cfgName, cfg of mailtool.getMailerConfig accountSpec.name
-        (=>
-          accountSlug = slugify accountSpec.name
+        ((accountName, cfgName) =>
+          accountSlug = slugify accountName
           cfgSlug     = slugify cfgName
           if cfgName is 'default'
             commands["email:send-mail-using-#{accountSlug}"] = =>
-              @sendMail "#{accountSpec.name}.default"
+              @sendMail "#{accountName}.default"
           else
             commands["email:send-mail-using-#{accountSlug}-#{cfgSlug}"] = =>
-              @sendMail "#{accountSpec.name}.#{cfgName}"
-        )()
+              @sendMail "#{accountName}.#{cfgName}"
+        )(accountSpec.name, cfgName)
+
+
+      # if mailtool.hasMailbox(accountSpec.name)
+      #   ((accountName) =>
+      #     commands["email:open-mailbox-for-#{accountName}"] = =>
+      #       atom.workspace.open "mailbox://#{accountName}"
+      #   )(accountSpec.name)
 
     @accountSubscriptions.add atom.commands.add 'atom-workspace', commands
 
@@ -62,6 +69,8 @@ module.exports = Email =
     @subscriptions = new CompositeDisposable
 
     @subscriptions.add atom.views.addViewProvider MailboxEditor, (model) =>
+      debugger
+
       new MailboxEditorElement().initialize(model)
 
     # Register command that toggles this view
@@ -72,16 +81,17 @@ module.exports = Email =
     @updateAccountSubscriptions()
 
     @subscriptions.add atom.workspace.addOpener (uri) =>
+      debugger
 
       if m = uri.match /^mailbox:\/\/([^\/]*)(\/.*)?/
         [config, path] = m[1..]
 
-        return new MailboxEditor {config, path}
+        return atom.views.getView(new MailboxEditor {config, path})
 
       if m = uri.match /^(imap(\+tls|s)?):\/\/(?:([^:@]*)(?::[^@]*)?@)?(\w+(?:\.\w+)*)(?::(\d+))?(\/.*)?/
         [scheme, user, pass, host, port, path] = m[1..]
 
-        return new MailboxEditor {scheme, auth: {user, pass}, host, port, path}
+        return atom.views.getView(new MailboxEditor {scheme, auth: {user, pass}, host, port, path})
 
     @version = JSON.parse(fs.readFileSync "#{__dirname}/../package.json").version
 
@@ -205,6 +215,7 @@ module.exports = Email =
 
         console.log "#{err}", err, options, err.stack
         atom.notifications.addError "#{err}", detail: CSON.stringify({options, traceback: err.stack})
+
       else
         console.log "Email sent", err, info
 
