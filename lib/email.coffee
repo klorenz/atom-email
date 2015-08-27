@@ -54,11 +54,11 @@ module.exports = Email =
         )(accountSpec.name, cfgName)
 
 
-      # if mailtool.hasMailbox(accountSpec.name)
-      #   ((accountName) =>
-      #     commands["email:open-mailbox-for-#{accountName}"] = =>
-      #       atom.workspace.open "mailbox://#{accountName}"
-      #   )(accountSpec.name)
+      if mailtool.hasMailbox(accountSpec.name)
+        ((accountName) =>
+          commands["email:open-mailbox-for-#{accountName}"] = =>
+            atom.workspace.open "mailbox://#{accountName}"
+        )(accountSpec.name)
 
     @accountSubscriptions.add atom.commands.add 'atom-workspace', commands
 

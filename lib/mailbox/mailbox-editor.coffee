@@ -1,78 +1,66 @@
 {Emitter, CompositeDisposable} = require 'atom'
 Q = require 'q'
 
-# model
+# Public: Mailbox editor
+#
+#
 class MailboxEditor
 
-  constructor: (@options={}) ->
+  # Public:
 
+  constructor: (@options={}) ->
     # promise for logged in imap connection
     @mailtool = require '../mail-tool'
+    @imap = @mailtool.getImapConnection @options
+    @emitter = new Emitter
+    @suscriptions = new CompositeDisposable
 
-    # @mailbox = @mailtool.openMailbox @options
-    # @mailbox.selectFolder(@options.path).then =>
-    #   @mailbox.getMessages
-    #     onNextMessages: (msgs) =>
+  # Essential: Opens a mailbox using underlying imap connection
+  #
+  # path - path of mailbox
+  #
+  # Examples
+  #
+  #    mailboxEditor.openMailbox("INBOX").then (mailbox) =>
+  #       # connect to mailbox events
+  #
+  # Returns a promise to a mailbox object.
+  openMailbox: (path) ->
+    @imap.login().then (mailbox) =>
+      @subscriptions.add mailbox.onDidStartGetMessages (messages, options) =>
+        @emitter.emit 'did-start-get-messages', messages, options
+      @subscriptions.add mailbox.onDidProgressGetMessages (messages, options) =>
+        @emitter.emit 'did-progress-get-messages', messages, options
+      @subscriptions.add mailbox.onDidEndGetMessages (messages, options) =>
+        @emitter.emit 'did-end-get-messages', messages, options
+      @subscriptions.add mailbox.onError (error) =>
+        atom.notifications.addEror error
+      @subscriptions.add mailbox.onDidSelectMailbox (path, info) =>
+        @emitter.emit 'did-select-mailbox', path, info
 
-    # imap = @mailtool.getImapConnection(@options)
-    # @imap = Q.Promise (resolve) =>
-    #   imap.login().then => resolve(imap)
-
-    # promise for lost of folders
-    #@folders = @getMailboxFolders()
-
-    # promise for path of current folder
-    # @selectedFolder = Q.Promise (resolve) =>
-    #   if @options.path
-    #     resolve @options.path
-    #   else
-    #     @folders.then() (folders) =>
-    #       debugger
-    #       console.log folders
-    #
-    # @messages = {}
-    #
-
-  # selectFolder: (folder) ->
-  #   @selectedFolder = Q(folder)
-  #
-  # getMailboxFolders: () ->
-  #   Q.Promise (resolve) =>
-  #     @imap.then (imap) =>
-  #       imap.listWellKnownFolders().then (folderInfo) =>
-  #         resolve(folderInfo)
-  #
-  # listMessages: () ->
-  #   Q.Promise (resolve) =>
-  #     @selectedFolder.then (folder) =>
-  #       if folder of @messages
-  #         resolve(@messages[folder].messages)
-  #       else
-  #         @imap.then (imap) =>
-  #           imap.listMessages(path: folder).then (messages) =>
-  #             lastUid = 0
-  #             for msg in messages
-  #               lastUid = msg.uid if msg.uid > lastUid
-  #             @messages[folder] = {messages, lastUid}
-  #
-  #             resolve(@messages[folder].messages)
-  #
-  # updateMessageList: ->
-  #   @withImap (imap) =>
-  #     imap.listMessages(@path)
-  #
+      @emitter.emit 'did-select-mailbox', mailbox.path, mailbox.info
 
   ###
   Section: Event Subscriptions
   ###
 
-  # Essential: Calls your callback, if mailbox contents (mails) have been updated
+  # Essential: Calls your callback, if mailbox is selected
   #
   # * `callback` {Function}
-  #   * parameter ...
+  #   * `path` - path of selected mailbox
+  #   * `info` - info of selected Mailbox
   #
-  #  Returns a {Disposable} on which `.dispose()` can be called to unsubscribe
-  onDidUpdateMailboxContents: (callback) ->
-    @emitter.on 'did-update-mailbox-contents', callback
+  # Returns a {Disposable}
+  onDidSelectMailbox: (callback) ->
+    @emitter.on 'did-select-mailbox', callback
+
+  onDidStartGetMessages: (callback) ->
+    @emitter.on 'did-start-get-messages', callback
+
+  onDidProgressGetMessages: (callback) ->
+    @emitter.on 'did-progress-get-messages', callback
+
+  onDidEndGetMessages: (callback) ->
+    @emitter.on 'did-end-get-messages', callback
 
 module.exports = {MailboxEditor}
