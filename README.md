@@ -8,7 +8,9 @@ What it supports for now
 ------------------------
 
 - Email configuration file
-
+- Open mailbox specified in [mailtool configuration](https://www.npmjs.com/package/mailtool)
+- browse mails (no changes of flags or else possible yet)
+- only INBOX browseable
 
 Configuration
 -------------
@@ -19,7 +21,7 @@ of accounts, with a descriptive name as key.
 
 Each account can have following fields:
 
-- **transport**, See https://www.npmjs.com/package/nodemailer-smtp-transport
+- **transport**, See https://www.npmjs.com/package:/nodemailer-smtp-transport
 - **default**, Prefill this with options from
   https://www.npmjs.com/package/nodemailer#e-mail-message-fields.  Additionally
   you can use **signature** for passing a signature.
@@ -43,7 +45,7 @@ Regards
 
 Select it and then run "Email: Send Mail" command.
 
-Or select some text and run "Email: Send Mail" command.  There will be opened input dialogs for 
+Or select some text and run "Email: Send Mail" command.  There will be opened input dialogs for
 entering Subject, to address and other.  Confirm with `Enter`, cancel with `ESC`.
 
 
