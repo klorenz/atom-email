@@ -69,8 +69,6 @@ module.exports = Email =
     @subscriptions = new CompositeDisposable
 
     @subscriptions.add atom.views.addViewProvider MailboxEditor, (model) =>
-      debugger
-
       new MailboxEditorElement().initialize(model)
 
     # Register command that toggles this view
@@ -81,8 +79,6 @@ module.exports = Email =
     @updateAccountSubscriptions()
 
     @subscriptions.add atom.workspace.addOpener (uri) =>
-      debugger
-
       if m = uri.match /^mailbox:\/\/([^\/]*)(\/.*)?/
         [config, path] = m[1..]
 

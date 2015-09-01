@@ -7,17 +7,33 @@ module.exports =
 class MailboxView extends View
   @content: ->
     @div class: 'mailbox-view', outlet: 'mailbox', =>
-      @div class: 'mailbox-title', =>
-        @span class: 'mailbox-title', outlet: 'mailboxTitle'
-        @span " ("
-        @span class: 'mailbox-message-count', outlet: 'mailboxMessageCount'
-        @span ")"
-      @div class: 'mail-list-view-container', outlet: 'mailListViewContainer', =>
+      @header =>
+        @button class: 'btn', outlet: 'mailboxTitle'
+        @span class: 'mailbox-message-count', outlet: 'messageCount'
+
+        # @span class: 'btn-group', =>
+        #   @span class: 'caption', 'Filter'
+        #   @button class: 'btn', outlet: 'filterFrom', 'From'
+        #   @button class: 'btn', outlet: 'filterSubject', 'Subject'
+        #   @button class: 'btn', outlet: 'filterSentDate', 'Date'
+        #
+        # @span class: 'btn-group', =>
+        #   @span class: 'caption', 'Sort'
+        #   @span class: 'btn', outlet: 'sortFrom', 'From'
+        #   @span class: 'btn', outlet: 'sortSubject', 'Subject'
+        #   @span class: 'btn', outlet: 'sortSentDate', 'Date'
+        #   @span " "
+        #   @span class: 'btn', outlet: 'sortAsc', 'Asc'
+        #   @span class: 'btn', outlet: 'sortDesc', 'Desc'
+
+      @section class: 'mail-list-view-container', outlet: 'mailListViewContainer', =>
         @subview 'mailListView', new MailListView
-      @div class: 'mailbox-toolbar'
 
   initialize: (state)->
-    {@mailboxEditor, mailboxPath} = state
+    {@mailboxEditor, mailboxPath, @sortType, @sortBy, @filter} = state
+
+    @sortType = 'desc' unless @sortType
+    @sortBy   = 'sentDate' unless @sortBy
 
     @mailboxEditor.onDidStartGetMessages (messages) =>
       @mailListView.setItems values messages
@@ -28,23 +44,15 @@ class MailboxView extends View
     @mailboxEditor.onDidEndGetMessages (messages) =>
       @mailListView.setItems values messages
 
-    @mailboxEditor.onDidSelectMailbox @didSelectMailbox
+    @mailboxEditor.onDidSelectMailbox ({path, info}) =>
+      @mailboxTitle.text(path)
+      @messageCount.text(info.exists)
+
+    @mailListView.onDidSelectItem (item) =>
+      @mailboxEditor.displayMessage(item)
 
     @mailboxEditor.openMailbox()
 
-    # u nless mailboxPath
-    #   mailboxPath = @mailboxEditor.getInboxPath()
-    #
-    # @mailboxEditor.openMailbox(mailboxPath).then (mailbox) =>
-    #   @mailbox = mailbox
-
-
-  didSelectMailbox: (path, info) =>
-    #@mailboxPath = path
-    #@mailListView.setItems @mailbox.getMessages()
-    #@mailListView.setMailbox @mailbox
-    @mailboxTitle.text(path)
-    @messageCount.text(info.exists)
 
   selectMailbox: (path) ->
     @mailboxEditor.selectMailbox(path)
