@@ -49,9 +49,12 @@ class MailboxView extends View
       @messageCount.text(info.exists)
 
     @mailListView.onDidSelectItem (item) =>
-      @mailboxEditor.displayMessage(item)
+      @mailboxEditor.showMessage(item)
 
     @mailboxEditor.openMailbox()
+
+    @mailboxTitle.on 'click', =>
+      @mailboxEditor.showMailboxSelector()
 
 
   selectMailbox: (path) ->

@@ -22,7 +22,9 @@ formatAddressList = (o) ->
 module.exports =
   class MailListView extends SelectListView
     initialize: ->
+      debugger
       super
+      @filterEditorView.off('blur')
       @focusFilterEditor()
       @setMaxItems(100)
       @displayFields = ['sentDate', 'sender', 'subject']

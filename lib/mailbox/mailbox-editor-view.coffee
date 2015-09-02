@@ -1,6 +1,7 @@
 {View} = require 'atom-space-pen-views'
 
 MailboxView = require './mailbox-editor-mailbox-view.coffee'
+MailboxListView = require './mailbox-mailbox-listview.coffee'
 MailView = require './mailbox-editor-mail-view.coffee'
 
 module.exports =
@@ -18,6 +19,7 @@ class MailboxEditorView extends View
 
     @mailboxView = new MailboxView {@mailboxEditor}
     @mailView = new MailView {@mailboxEditor}
+    @mailboxListView = new MailboxListView {@mailboxEditor}
 
     @mailboxViewContainer.append @mailboxView.element
     @mailViewContainer.append @mailView.element

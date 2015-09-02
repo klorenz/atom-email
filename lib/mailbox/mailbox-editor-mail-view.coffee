@@ -4,18 +4,19 @@ module.exports =
 class MailView extends ScrollView
   @content: ->
     # header for buttons "source", "mail"
-    @div class: "mail-view"
+    @div class: "mail-view", =>
+      @div class: "mail-container", outlet: 'mailContainer'
 
   initialize: (state) ->
     super
     {@mailboxEditor} = state
 
-    @displayedMessage = null
+    @visibleMessage = null
 
     @prefer = [ "html", "text" ]
 
-    @mailboxEditor.onDidRequestDisplayMessage (message) =>
-      return if message.uid == @displayedMessage?.uid
+    @mailboxEditor.onDidRequestShowMessage (message) =>
+      return if message.uid == @visibleMessage?.uid
 
       for preferred in @prefer
         neededParts = message.getBodyPartsForType preferred
@@ -23,17 +24,17 @@ class MailView extends ScrollView
 
       @mailboxEditor.getMessageBodyParts(message, neededParts).then (parts) =>
         console.log parts
-        @html('')
+        @mailContainer.html('')
 
         for part in parts
           if part.type == 'html'
             console.log part
-            @append(part.content)
+            @mailContainer.append(part.content)
           else
             #content = part.content.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;')
-            @append("<pre>#{part.content}</pre>")
+            @mailContainer.append("<pre>#{part.content}</pre>")
 
-        @displayedMessage = message
+        @visibleMessage = message
       .catch (error) =>
         atom.notifications.addError "Could not load message parts", detail: "#{error}", stack: error.stack, dismissable: true
 
