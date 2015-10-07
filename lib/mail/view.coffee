@@ -1,4 +1,8 @@
-{ScrollView} = require 'atom-space-pen-views'
+# {ScrollView} = require 'atom-space-pen-views'
+
+
+
+
 
 module.exports =
 class MailView extends ScrollView
@@ -7,15 +11,16 @@ class MailView extends ScrollView
     @div class: "mail-view", =>
       @div class: "mail-container", outlet: 'mailContainer'
 
-  initialize: (state) ->
-    @panel = atom.workspace.addRightPanel(item: this, visible: false)
-    @visibleMessage = null
-
-    @subscriptions.add atom.commands.addCommand "atom.workspace", "email:toggle-preview", =>
-      if @panel.isVisible()
-        @panel.hide()
-      else
-        @panel.show()
+  # initialize: (state) ->
+  #
+  #   @panel = atom.workspace.addRightPanel(item: this, visible: false)
+  #   @visibleMessage = null
+  #
+  #   @subscriptions.add atom.commands.addCommand "atom.workspace", "email:toggle-preview", =>
+  #     if @panel.isVisible()
+  #       @panel.hide()
+  #     else
+  #       @panel.show()
 
   showMessage: (message, parts) ->
     return if message.uid == @visibleMessage?.uid

@@ -9,7 +9,10 @@ class MailboxView extends View
     @div class: 'mailbox-view', outlet: 'mailbox', =>
       @header =>
         @button class: 'btn', outlet: 'mailboxTitle'
-        @span class: 'mailbox-message-count', outlet: 'messageCount'
+        @span class: 'mailbox-stats', =>
+          @span class: 'mailbox-filtered-count', outlet: 'filteredCount', '0'
+          @span "/"
+          @span class: 'mailbox-message-count', outlet: 'messageCount', '0'
 
         # @span class: 'btn-group', =>
         #   @span class: 'caption', 'Filter'
@@ -33,7 +36,7 @@ class MailboxView extends View
     {@mailboxEditor, mailboxPath, @sortType, @sortBy, @filter} = state
 
     @sortType = 'desc' unless @sortType
-    @sortBy   = 'sentDate' unless @sortBy
+    @sortBy   = 'sent' unless @sortBy
 
     @mailboxEditor.onDidStartGetMessages (messages) =>
       @mailListView.setItems values messages
@@ -49,7 +52,18 @@ class MailboxView extends View
       @messageCount.text(info.exists)
 
     @mailListView.onDidSelectItem (item) =>
-      @mailboxEditor.showMessage(item)
+      @mailboxEditor.selectMessage(item)
+
+    @mailListView.onDidPopulateList ({items, count}) =>
+      @filteredCount.removeClass('filter-overflow')
+      @filteredCount.attr('title', '# of hits')
+
+      if count < items.length
+        @filteredCount.addClass('filter-overflow')
+        @filteredCount.attr('title', 'too many hits')
+
+      @filteredCount.text(count)
+      @mailboxEditor.selectMessages items
 
     @mailboxEditor.openMailbox()
 

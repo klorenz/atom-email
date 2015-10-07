@@ -93,3 +93,7 @@ imaps://user:passwd@imap.host.com:993/
 - Have a bottom panel, which is a "docked" listview, containing mails in current folder.
   - there is a subcommand opening a folderSelectView, which does select a folder to be opened in such a docked
     listview.
+
+
+Font : http://adamwhitcroft.com/batch/
+Font : http://typicons.com/

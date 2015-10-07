@@ -11,4 +11,10 @@ class MailboxEditorElement extends HTMLElement
   getTitle: ->
     return "mailbox"
 
+  setModel: (@model) ->
+
+  destroy: ->
+    debugger
+    @mailboxEditor.destroy()
+
 module.exports = MailboxEditorElement = document.registerElement 'mailbox-editor', prototype: MailboxEditorElement.prototype

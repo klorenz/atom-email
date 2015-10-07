@@ -1,0 +1,108 @@
+@font-face {
+  font-family: 'email-icons';
+  src: url('../font/email-icons.eot?39930809');
+  src: url('../font/email-icons.eot?39930809#iefix') format('embedded-opentype'),
+       url('../font/email-icons.woff?39930809') format('woff'),
+       url('../font/email-icons.ttf?39930809') format('truetype'),
+       url('../font/email-icons.svg?39930809#email-icons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'email-icons';
+    src: url('../font/email-icons.svg?39930809#email-icons') format('svg');
+  }
+}
+*/
+ 
+ [class^="email-icon-"]:before, [class*=" email-icon-"]:before {
+  font-family: "email-icons";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+ 
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+ 
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+ 
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+ 
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+ 
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+ 
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+ 
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+ 
+.email-icon-mail-2:before { content: '\e800'; } /* '' */
+.email-icon-folder-add:before { content: '\e803'; } /* '' */
+.email-icon-folder-delete:before { content: '\e804'; } /* '' */
+.email-icon-many:before { content: '\e806'; } /* '' */
+.email-icon-one:before { content: '\e807'; } /* '' */
+.email-icon-filter:before { content: '\e808'; } /* '' */
+.email-icon-attach-1:before { content: '\e809'; } /* '' */
+.email-icon-sort-alt-up:before { content: '\e80a'; } /* '' */
+.email-icon-sort-alt-down:before { content: '\e80b'; } /* '' */
+.email-icon-view-source:before { content: '\e80c'; } /* '' */
+.email-icon-reply-outline:before { content: '\e80d'; } /* '' */
+.email-icon-forward-outline:before { content: '\e80e'; } /* '' */
+.email-icon-tag:before { content: '\e80f'; } /* '' */
+.email-icon-tags:before { content: '\e810'; } /* '' */
+.email-icon-cloud-flash:before { content: '\e811'; } /* '' */
+.email-icon-flash:before { content: '\e812'; } /* '' */
+.email-icon-flash-outline:before { content: '\e813'; } /* '' */
+.email-icon-mail:before { content: '\e814'; } /* '' */
+.email-icon-mail-alt:before { content: '\e815'; } /* '' */
+.email-icon-star-outline:before { content: '\e816'; } /* '' */
+.email-icon-star-filled:before { content: '\e817'; } /* '' */
+.email-icon-cancel:before { content: '\e818'; } /* '' */
+.email-icon-settings:before { content: '\e819'; } /* '' */
+.email-icon-cog:before { content: '\e81a'; } /* '' */
+.email-icon-sliders:before { content: '\e81b'; } /* '' */
+.email-icon-trash-empty:before { content: '\e81c'; } /* '' */
+.email-icon-heart:before { content: '\e81d'; } /* '' */
+.email-icon-heart-empty:before { content: '\e81e'; } /* '' */
+.email-icon-star:before { content: '\e81f'; } /* '' */
+.email-icon-star-empty:before { content: '\e820'; } /* '' */
+.email-icon-new-mail:before { content: '\e821'; } /* '' */
+.email-icon-edit:before { content: '\e822'; } /* '' */
+.email-icon-address-book:before { content: '\e823'; } /* '' */
+.email-icon-paper-plane-empty:before { content: '\e824'; } /* '' */
+.email-icon-users:before { content: '\e825'; } /* '' */
+.email-icon-inbox:before { content: '\e826'; } /* '' */
+.email-icon-download:before { content: '\e827'; } /* '' */
+.email-icon-trash:before { content: '\e828'; } /* '' */
+.email-icon-show-header:before { content: '\e829'; } /* '' */
+.email-icon-email:before { content: '\e82a'; } /* '' */
+.email-icon-book:before { content: '\e82b'; } /* '' */
+.email-icon-floppy:before { content: '\e82c'; } /* '' */
+.email-icon-floppy-1:before { content: '\e82d'; } /* '' */
+.email-icon-attach:before { content: '\e82e'; } /* '' */
+.email-icon-ok:before { content: '\e82f'; } /* '' */
+.email-icon-cancel-1:before { content: '\e830'; } /* '' */
+.email-icon-reply:before { content: '\e834'; } /* '' */
+.email-icon-reply-all:before { content: '\e835'; } /* '' */
+.email-icon-forward:before { content: '\e836'; } /* '' */
+.email-icon-right-dir:before { content: '\e837'; } /* '' */
+.email-icon-folder:before { content: '\e838'; } /* '' */
+.email-icon-folder-outline:before { content: '\e839'; } /* '' */

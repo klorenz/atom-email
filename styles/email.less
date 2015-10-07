@@ -2,43 +2,195 @@
 //
 // See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
 // for a full listing of what's available.
+
 @import "ui-variables";
+@import "fonts.less";
+@import "fontello/email-icons.less";
+@import "email-icons-custom.less";
+
+@resizer-size: 0.5rem;
+
+atom-panel {
+  .mail-preview {
+    display: flex;
+
+    .mail-preview-container {
+      flex: 99;
+
+
+      .placeholder {
+        font-size: 700%;
+        text-align: center;
+        height: 100%;
+        margin-top: 50%;
+        transform: translate(0, -25%);
+      }
+    }
+  }
+}
+
+atom-panel.top, atom-panel.bottom {
+  .mail-preview {
+    height: 50%;
+
+    .mail-preview-resizer {
+      height: @resizer-size;
+    }
+    .mail-preview-container {
+      height: 100%;
+    }
+  }
+}
+
+mail-message {
+  display: flex;
+  flex-direction: column;
+  header {
+    padding: 1em ;
+  }
+  section.message-body {
+    padding: 1em ;
+    overflow: auto;
+    flex: 99;
+  }
+  section.attachments {
+    overflow: auto;
+  }
+}
+
+atom-panel.left, atom-panel.right {
+  .mail-preview {
+    height: 100%;
+
+    .mail-preview-resizer {
+      width: @resizer-size;
+      height: 100%;
+    }
+
+    .mail-preview-container {
+      width: 50rem;
+      height: 100%;
+    }
+  }
+}
+
+atom-panel .mail-view {
+  text-align: center;
+
+  header .label {
+    display: inline-block;
+    width: 6em;
+    text-align: left;
+  }
+
+  .mail-container {
+    width: 55em;
+    display: inline-block;
+    text-align: left;
+  }
+
+  pre {
+        padding: 1%;
+        height: 98%;
+        overflow: auto;
+        font-family:  Menlo, Consolas, 'DejaVu Sans Mono', 'Lucida Console', monospace;
+      }
+}
 
 mailbox-editor > div {
-  height: 100%
+  height: 100%;
 }
 
-mailbox-editor header {
-  padding: 0.5em;
-}
+mailbox-editor {
+  header {
+    padding: 0.5em;
+  }
 
-mailbox-editor span.field-sentDate {
-  float: right;
-}
+  .mailbox-editor-container {
+    // display: flex;
+    // flex-direction: row;
+    height: 100%;
 
-mailbox-editor span.field-subject {
-  display: block;
-  font-size: 150%;
-}
 
-mailbox-editor li {
-  padding: 0.5em;
-}
+    .mailbox-editor-toolbar {
+      display: flex;
+      width: 100%;
+      justify-content: flex-end;
+      padding: 0.4rem;
+      .btn-group {
+        padding-left: 1em;
+      }
+    }
 
-mailbox-editor div.mail-view {
-  padding: 1%;
-  height: 98%;
-  overflow: auto;
-  font-family:  Menlo, Consolas, 'DejaVu Sans Mono', 'Lucida Console', monospace;
-}
+    .mailbox-view-container {
+      header {
+        display: flex;
+        justify-content: space-between;
 
-mailbox-editor div.mail-container {
-  max-width: 50em;
-}
+        .btn-group {
+          padding-left: 1em;
+        }
 
-div.mailbox-list-view .character-match {
-  font-weight: bold;
-}
+        .tool-group-select-mailbox {
+        }
 
-.email {
+        .tool-group-mailbox-tools {
+        }
+
+        .mailbox-stats {
+           padding-left: 1em;
+           .filter-overflow {
+             color: @text-color-error;
+           }
+        }
+
+      }
+
+      atom-text-editor {
+        margin: 0.5em;
+      }
+
+
+      div.mailbox-list-view .character-match {
+        font-weight: bold;
+      }
+
+      li, li.selected {
+        padding: 0.5em;
+
+        .mailbox-editor-mail-info {
+          position: relative;
+
+
+          span.field-from {
+            position: absolute;
+            top: 0;
+          }
+
+          span.field-sent {
+            position: absolute;
+            top: 0;
+            right: 0;
+  //          float: right;
+          }
+
+          span.field-flag {
+            position: absolute;
+            top: 1rem;
+            right: 0;
+            padding: 0.5rem 0;
+  //          float: right;
+          }
+
+          span.field-subject {
+            display: block;
+            padding-top: 2rem;
+            font-size: 120%;
+            white-space: normal;
+            width: 90%;
+          }
+        }
+      }
+    }
+  }
 }

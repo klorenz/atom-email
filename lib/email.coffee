@@ -1,3 +1,5 @@
+# TODO: Documentation email
+
 EmailView = require './email-view'
 FolderView = require './folder-view'
 {CompositeDisposable} = require 'atom'
@@ -7,6 +9,8 @@ fs = require 'fs-plus'
 
 {MailboxEditor} = require './mailbox/mailbox-editor.coffee'
 MailboxEditorElement = require './mailbox/mailbox-editor-element.coffee'
+MailMessageElement = require './mail/element.coffee'
+{MailMessage} = require 'mailtool'
 
 {showModalInputPanel} = require './input-view.coffee'
 
@@ -65,11 +69,16 @@ module.exports = Email =
   activate: (state) ->
     @initDirectories()
 
+    @mailPreview = require './mail/preview.coffee'
+
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
 
     @subscriptions.add atom.views.addViewProvider MailboxEditor, (model) =>
       new MailboxEditorElement().initialize(model)
+
+    @subscriptions.add atom.views.addViewProvider MailMessage, (model) =>
+      new MailMessageElement().initialize(model)
 
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-workspace',
@@ -88,6 +97,19 @@ module.exports = Email =
         [scheme, user, pass, host, port, path] = m[1..]
 
         return atom.views.getView(new MailboxEditor {scheme, auth: {user, pass}, host, port, path})
+
+      if m = uri.match /^mailto:(.*)/
+        texteditor = new TextEditor(uri)
+        texteditor.insert "To: "+m[1]+"\n"
+
+        texteditor.onDidSave =>
+           # #TODO:0 under which circumstances save mail to (which) drafts?
+
+           @sendMail (err, info, opts) =>
+             @notifyMailSent err, info, opts
+             texteditor.destroy() unless err?
+
+        return atom.views.getView(new TextEditor(uri))
 
     @version = JSON.parse(fs.readFileSync "#{__dirname}/../package.json").version
 
@@ -111,6 +133,8 @@ module.exports = Email =
   deactivate: ->
     @modalPanel.destroy()
     @subscriptions.dispose()
+    @mailPreview.destroy()
+
 #    @emailView.destroy()
 #    @folderView.destroy()
 
@@ -144,6 +168,8 @@ module.exports = Email =
               signature: """
                  Your Signature
               """
+
+        default: "YourAccountDescriptiveName"
         '''
 
   # updateFolderView: ->
@@ -153,7 +179,10 @@ module.exports = Email =
   # listFolders: ->
   #   @folderView.show()
   #
-  sendMail: (config=null)->
+  sendMail: (config=null, callback=null) ->
+    if config instanceof Function
+      callback = config
+      config = null
 
     if not fs.existsSync @configFile
       return @openConfigFile()
@@ -204,17 +233,34 @@ module.exports = Email =
                         options.bcc = text
                         proceed()
 
+    mailtool.sendMail(options)
+    .then (info, errors) =>
+      dummy = 1
+    .progress (info) =>
+      @notifyMailSent info, options
+    .catch (error) =>
+      @notifyMailSent err, options
+    .done()
 
     mailtool.sendMail options, (err, info) =>
-
-      if err instanceof Error
-
-        console.log "#{err}", err, options, err.stack
-        atom.notifications.addError "#{err}", detail: CSON.stringify({options, traceback: err.stack})
-
+      if callback
+        return callback(err, info, options)
       else
-        console.log "Email sent", err, info
+        @notifyMailSent err, info, options
 
+  notifyMailSent: (info, options={}) =>
+    if info instanceof Error
+      err = info
+      errors = [err]
+      errors = err.errors if err.errors
+
+      for error in errors
+        atom.notifications.addError "Error sending mail :(", detail: "#{error}", stack: error.stack, dismissable: true
+
+    else
+      console.log "notify email sent", info
+
+      if info.envelope
         detail = """
           #{info.response}
           From: #{info.envelope.from}\n
@@ -225,3 +271,10 @@ module.exports = Email =
           detail = detail + "Rejected: " + info.rejected.join(", ")
 
         atom.notifications.addSuccess "Email sent :)", detail: detail
+
+      else if info.storage
+        detail = """Email stored to #{info.scheme} #{info.name} #{info.folder}"""
+        atom.notifications.addSuccess "Email stored :)", detail: detail
+
+
+      # atom.notifications.addError "Error sending mail :(", detail: "#{err}", stack: err.stack, dismissable: true
