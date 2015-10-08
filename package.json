@@ -1,7 +1,7 @@
 {
   "name": "email",
   "main": "./lib/email",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Mail selected text out of atom (beta)",
   "activationCommands": {},
   "repository": "https://github.com/klorenz/atom-email.git",
